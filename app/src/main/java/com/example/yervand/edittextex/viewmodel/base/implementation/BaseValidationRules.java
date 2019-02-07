@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public abstract class BaseValidationRules<T> extends ValidatorHandler<T> implements Validator<T> {
 
     private ArrayList<String> errorMessages = new ArrayList<>();
+    private int n = 0;
 
 
     public void addMessage(String validationErrorMessage) {
@@ -19,6 +20,8 @@ public abstract class BaseValidationRules<T> extends ValidatorHandler<T> impleme
                 break;
             }
         }
+
+
         if (!found) {
             errorMessages.add(validationErrorMessage);
         }
