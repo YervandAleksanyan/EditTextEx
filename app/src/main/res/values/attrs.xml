@@ -6,7 +6,7 @@
         <attr name="floatHintText" format="string" />
         <attr name="floatHintTextColorFocused" format="color" />
         <attr name="floatHintTextColorUnFocused" format="color" />
-        <attr name="floatErrorTextColor" format="color" />
+        <attr name="floatTitleErrorColor" format="color" />
         <attr name="floatHintTextStyle">
             <enum name="normal" value="0" />
             <enum name="bold" value="1" />

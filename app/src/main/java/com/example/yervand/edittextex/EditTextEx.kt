@@ -6,8 +6,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -85,30 +83,30 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         addView(editText)
         title!!.visibility = View.INVISIBLE
 
-        editText!!.addTextChangedListener(object : TextWatcher {
-
-            override fun onTextChanged(
-                s: CharSequence, start: Int, before: Int,
-                count: Int
-            ) {
-                if (editText!!.text.toString().isNotEmpty() && title!!.visibility == View.INVISIBLE) {
-                    showHint()
-                } else if (editText!!.text.toString().isEmpty() && title!!.visibility == View.VISIBLE) {
-                    hideHint()
-                }
-            }
-
-            override fun beforeTextChanged(
-                s: CharSequence, start: Int, count: Int,
-                after: Int
-            ) {
-                // TODO Auto-generated method stub
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                // TODO Auto-generated method stub
-            }
-        })
+//        editText!!.addTextChangedListener(object : TextWatcher {
+//
+//            override fun onTextChanged(
+//                s: CharSequence, start: Int, before: Int,
+//                count: Int
+//            ) {
+//                if (editText!!.text.toString().isNotEmpty() && title!!.visibility == View.INVISIBLE) {
+//                    showHint()
+//                } else if (editText!!.text.toString().isEmpty() && title!!.visibility == View.VISIBLE) {
+//                    hideHint()
+//                }
+//            }
+//
+//            override fun beforeTextChanged(
+//                s: CharSequence, start: Int, count: Int,
+//                after: Int
+//            ) {
+//                // TODO Auto-generated method stub
+//            }
+//
+//            override fun afterTextChanged(s: Editable) {
+//                // TODO Auto-generated method stub
+//            }
+//        })
     }
 
     @SuppressLint("ResourceType")
@@ -126,6 +124,12 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         title!!.setPadding(5, 2, 5, 2)
     }
 
+    private var floatTitleErrorColor: ColorStateList? = null
+
+    private var floatHintTextColorFocused: ColorStateList? = null
+
+    private var floatHintTextColorUnFocused: ColorStateList? = null
+
     private fun createCustomLayout(attrs: AttributeSet) {
 
         val attr = context.obtainStyledAttributes(
@@ -136,11 +140,11 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         val floatHintText = attr
             .getString(R.styleable.EditTextEx_floatHintText)
         hint = floatHintText
-        val floatHintTextColorFocused = attr
+        floatHintTextColorFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorFocused)
-//        val floatHintTextErrorColor = attr
-//            .getColorStateList(R.styleable.EditText_floatErr)
-        val floatHintTextColorUnFocused = attr
+        floatTitleErrorColor = attr
+            .getColorStateList(R.styleable.EditTextEx_floatTitleErrorColor)
+        floatHintTextColorUnFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorUnFocused)
         val floatHintTextSize = attr.getInt(
             R.styleable.EditTextEx_floatHintTextSize, 15
@@ -239,12 +243,13 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
     fun setTitleText(msg: String) {
         val isError = !msg.isEmpty()
         if (isError) {
-//            setFloatHintTextColor()
+            setFloatHintTextColor(getColorStateList(floatTitleErrorColor, floatHintTextColorUnFocused))
             title!!.text = msg
         } else {
+            setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
             title!!.text = hint
         }
-        showHint(false)
+        showHint()
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {
@@ -317,8 +322,9 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
     private fun showHint(withAnimation: Boolean = true) {
         if (title!!.visibility != View.VISIBLE) {
             title!!.visibility = View.VISIBLE
-            if (withAnimation)
+            if (withAnimation) {
                 title!!.startAnimation(bottomUp)
+            }
         }
     }
 
