@@ -24,7 +24,8 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
     var editText: EditText? = null
         private set
-    private var title: TextView? = null
+    var title: TextView? = null
+    var hint: String = ""
     private var inpuTextParams: LinearLayout.LayoutParams? = null
     private var displayTextParams: LinearLayout.LayoutParams? = null
     private var bottomUp: Animation? = null
@@ -127,56 +128,58 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     private fun createCustomLayout(attrs: AttributeSet) {
 
-        val a = context.obtainStyledAttributes(
+        val attr = context.obtainStyledAttributes(
             attrs,
             R.styleable.EditTextEx, 0, 0
         )
         // For Floating Hint
-
-        val floatHintText = a
+        val floatHintText = attr
             .getString(R.styleable.EditTextEx_floatHintText)
-        val floatHintTextColorFocused = a
+        hint = floatHintText
+        val floatHintTextColorFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorFocused)
-        val floatHintTextColorUnFocused = a
+//        val floatHintTextErrorColor = attr
+//            .getColorStateList(R.styleable.EditText_floatErr)
+        val floatHintTextColorUnFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorUnFocused)
-        val floatHintTextSize = a.getInt(
+        val floatHintTextSize = attr.getInt(
             R.styleable.EditTextEx_floatHintTextSize, 15
         )
-        val floatHintTextTypefaceName = a
+        val floatHintTextTypefaceName = attr
             .getString(R.styleable.EditTextEx_floatHintTextTypeface)
-        val floatHintTextStyle = a.getInt(
+        val floatHintTextStyle = attr.getInt(
             R.styleable.EditTextEx_floatHintTextStyle, Typeface.NORMAL
         )
-        val floatHintTextGravity = a.getInt(
+        val floatHintTextGravity = attr.getInt(
             R.styleable.EditTextEx_floatHintTextGravity, Gravity.LEFT
         )
-        val floatHintTextBackground = a
+        val floatHintTextBackground = attr
             .getDrawable(R.styleable.EditTextEx_floatHintTextBackground)
 
         // For Actual Text
-        var text = a.getString(R.styleable.EditTextEx_text)
-        val textColor = a
+        var text = attr.getString(R.styleable.EditTextEx_text)
+        val textColor = attr
             .getColorStateList(R.styleable.EditTextEx_textColor)
-        val textSize = a.getInt(R.styleable.EditTextEx_textSize, 15)
-        val textTypefaceName = a
+        val textSize = attr.getInt(R.styleable.EditTextEx_textSize, 15)
+        val textTypefaceName = attr
             .getString(R.styleable.EditTextEx_textTypeface)
-        val textStyle = a.getInt(
+        val textStyle = attr.getInt(
             R.styleable.EditTextEx_textStyle,
             Typeface.NORMAL
         )
-        val textGravity = a.getInt(
+        val textGravity = attr.getInt(
             R.styleable.EditTextEx_textGravity,
             Gravity.LEFT
         )
 
-        val textBackground = a
+        val textBackground = attr
             .getDrawable(R.styleable.EditTextEx_textBackground)
-        val isPassword = a.getBoolean(
+        val isPassword = attr.getBoolean(
             R.styleable.EditTextEx_isPassword,
             false
         )
 
-        a.recycle()
+        attr.recycle()
 
         setFloatHintText(floatHintText)
         setFloatHintTextColor(
@@ -209,7 +212,6 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         )
 
         val colors = intArrayOf(focused?.defaultColor ?: Color.BLACK, unfocused?.defaultColor ?: Color.GRAY)
-
         return ColorStateList(states, colors)
     }
 
@@ -234,10 +236,15 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     }
 
-    fun setError(msg: String) {
-        showHint()
-        title!!.text = msg
-        title!!.setTextColor(Color.RED)
+    fun setTitleText(msg: String) {
+        val isError = !msg.isEmpty()
+        if (isError) {
+//            setFloatHintTextColor()
+            title!!.text = msg
+        } else {
+            title!!.text = hint
+        }
+        showHint(false)
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {
@@ -307,17 +314,19 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         }
     }
 
-    private fun showHint() {
+    private fun showHint(withAnimation: Boolean = true) {
         if (title!!.visibility != View.VISIBLE) {
             title!!.visibility = View.VISIBLE
-            title!!.startAnimation(bottomUp)
+            if (withAnimation)
+                title!!.startAnimation(bottomUp)
         }
     }
 
-    private fun hideHint() {
+    private fun hideHint(withAnimation: Boolean = true) {
         if (title!!.visibility != View.INVISIBLE) {
             title!!.visibility = View.INVISIBLE
-            title!!.startAnimation(bottomDown)
+            if (withAnimation)
+                title!!.startAnimation(bottomUp)
         }
     }
 

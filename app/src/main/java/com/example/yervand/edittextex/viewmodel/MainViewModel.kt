@@ -1,8 +1,6 @@
 package com.example.yervand.edittextex.viewmodel
 
-import android.app.Application
 import androidx.databinding.ObservableField
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import com.example.yervand.edittextex.viewmodel.base.ValidateableViewModel
 import com.example.yervand.edittextex.viewmodel.base.ViewModelValidator
