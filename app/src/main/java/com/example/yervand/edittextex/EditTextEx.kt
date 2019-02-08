@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -17,6 +18,7 @@ import android.view.animation.AnimationUtils
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatEditText
 
 class EditTextEx : LinearLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
@@ -52,7 +54,7 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     private fun createLayout(attrs: AttributeSet?) {
         val context = context
-        editText = EditText(context)
+        editText = AppCompatEditText(context)
         title = TextView(context)
         editText!!.onFocusChangeListener = this
         bottomUp = AnimationUtils.loadAnimation(context, R.anim.txt_bottom_up)
@@ -73,10 +75,10 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         editText!!.layoutParams = inpuTextParams
         title!!.layoutParams = displayTextParams
         orientation = LinearLayout.VERTICAL
-        createDefaultLayout()
 
         if (attrs != null) {
             createCustomLayout(attrs)
+            createDefaultLayout()
         }
 
         addView(title)
@@ -120,7 +122,9 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         val context = context
         editText!!.setTextAppearance(context, android.R.attr.textAppearanceMedium)
         title!!.setTextAppearance(context, android.R.attr.textAppearanceSmall)
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            editText!!.backgroundTintList = ColorStateList.valueOf(Color.RED)
+        }
         title!!.setPadding(5, 2, 5, 2)
     }
 
@@ -185,13 +189,13 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
         attr.recycle()
 
-//        setFloatHintText(floatHintText)
         setFloatHintTextColor(
             getColorStateList(
                 floatHintTextColorFocused,
                 floatHintTextColorUnFocused
             )
         )
+
         setFloatHintTextSize(floatHintTextSize)
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
@@ -240,18 +244,28 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     }
 
+    private var hadErrors = true
+
     fun setFloatHintText(msg: String) {
         val isError = !msg.isEmpty()
-        if (isError) {
-            setFloatHintTextColor(getColorStateList(floatTitleErrorColor, floatHintTextColorUnFocused))
-            title!!.text = msg
-        } else {
-            if (!text!!.isEmpty()) {
-                setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
-                title!!.text = hint
+        if (hadErrors != isError) {
+            if (isError) {
+                setFloatHintTextColor(getColorStateList(floatTitleErrorColor, floatHintTextColorUnFocused))
+                title!!.text = msg
+                hideHint()
+                showHint()
+            } else {
+                if (!text!!.isEmpty()) {
+                    setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
+                    title!!.text = hint
+                    hideHint()
+                    showHint()
+                } else {
+                    hideHint()
+                }
             }
         }
-        showHint()
+        hadErrors = isError
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {

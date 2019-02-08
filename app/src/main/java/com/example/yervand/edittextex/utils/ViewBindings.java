@@ -12,7 +12,6 @@ public class ViewBindings {
     public static void setValidationProperties(EditTextEx textInputLayout,
                                                ObservableArrayMap<ObservableField, String> errors,
                                                ObservableField property) {
-
         if (!errors.containsKey(property)) {
             textInputLayout.setFloatHintText("");
             return;
