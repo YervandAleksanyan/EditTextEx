@@ -185,7 +185,7 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
         attr.recycle()
 
-        setFloatHintText(floatHintText)
+//        setFloatHintText(floatHintText)
         setFloatHintTextColor(
             getColorStateList(
                 floatHintTextColorFocused,
@@ -240,14 +240,16 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     }
 
-    fun setTitleText(msg: String) {
+    fun setFloatHintText(msg: String) {
         val isError = !msg.isEmpty()
         if (isError) {
             setFloatHintTextColor(getColorStateList(floatTitleErrorColor, floatHintTextColorUnFocused))
             title!!.text = msg
         } else {
-            setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
-            title!!.text = hint
+            if (!text!!.isEmpty()) {
+                setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
+                title!!.text = hint
+            }
         }
         showHint()
     }
@@ -259,12 +261,6 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
         if (floatHintTextColor != null) {
             title!!.setTextColor(floatHintTextColor)
-        }
-    }
-
-    fun setFloatHintText(string: String?) {
-        if (string != null) {
-            title!!.text = string
         }
     }
 
@@ -332,7 +328,7 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         if (title!!.visibility != View.INVISIBLE) {
             title!!.visibility = View.INVISIBLE
             if (withAnimation)
-                title!!.startAnimation(bottomUp)
+                title!!.startAnimation(bottomDown)
         }
     }
 

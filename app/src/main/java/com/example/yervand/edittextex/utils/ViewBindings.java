@@ -14,12 +14,12 @@ public class ViewBindings {
                                                ObservableField property) {
 
         if (!errors.containsKey(property)) {
-            textInputLayout.setTitleText("");
+            textInputLayout.setFloatHintText("");
             return;
         }
         String error = errors.get(property);
         if (error != null) {
-            textInputLayout.setTitleText(error);
+            textInputLayout.setFloatHintText(error);
         }
     }
 
