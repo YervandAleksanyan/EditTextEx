@@ -1,12 +1,10 @@
 package com.example.yervand.edittextex
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -16,27 +14,23 @@ import android.view.View.OnFocusChangeListener
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.EditText
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatEditText
 
-class EditTextEx : LinearLayout, OnFocusChangeListener {
+class EditTextEx : RelativeLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
-    var editText: EditText? = null
-        private set
-    var title: TextView? = null
-    var hint: String = ""
-    private var inpuTextParams: LinearLayout.LayoutParams? = null
-    private var displayTextParams: LinearLayout.LayoutParams? = null
-    private var bottomUp: Animation? = null
-    private var bottomDown: Animation? = null
-    private val focusChangeListener: OnFloatingLableFocusChangeListener? = null
+    lateinit var editText: EditText
+    private lateinit var title: TextView
+    private lateinit var errorMsg: TextView
+    private lateinit var bottomUp: Animation
+    private lateinit var bottomDown: Animation
+    private lateinit var focusChangeListener: OnFloatingLableFocusChangeListener
 
     var text: String?
-        get() = editText!!.text.toString()
+        get() = editText.text.toString()
         set(string) {
             if (string != null) {
-                editText!!.setText(string)
+                editText.setText(string)
             }
         }
 
@@ -54,88 +48,44 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     private fun createLayout(attrs: AttributeSet?) {
         val context = context
-        editText = AppCompatEditText(context)
-        title = TextView(context)
-        editText!!.onFocusChangeListener = this
+        View.inflate(context, R.layout.edit_text_ex_layout, this)
+        editText = findViewById(R.id.input)
+        title = findViewById(R.id.title)
+        errorMsg = findViewById(R.id.error_msg)
+//        editText = AppCompatEditText(context)
+//        title = TextView(context)
+//        errorMsg = TextView(context)
+//
         bottomUp = AnimationUtils.loadAnimation(context, R.anim.txt_bottom_up)
         bottomDown = AnimationUtils.loadAnimation(
             context,
             R.anim.txt_bottom_down
         )
-        // Create Default Layout
-        inpuTextParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        displayTextParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-
-        editText!!.layoutParams = inpuTextParams
-        title!!.layoutParams = displayTextParams
-        orientation = LinearLayout.VERTICAL
-
+//        // Create Default Layout
+//        inputTextParams = RelativeLayout.LayoutParams(
+//            RelativeLayout.LayoutParams.MATCH_PARENT,
+//            RelativeLayout.LayoutParams.WRAP_CONTENT
+//        )
+//        displayTextParams = RelativeLayout.LayoutParams(
+//            RelativeLayout.LayoutParams.MATCH_PARENT,
+//            RelativeLayout.LayoutParams.WRAP_CONTENT
+//        )
+//        displayTextParams.addRule(RelativeLayout.BELOW, editText.id)
+//        editText.layoutParams = inputTextParams
+//        title.layoutParams = displayTextParams
+//        errorMsg.layoutParams = displayTextParams
         if (attrs != null) {
             createCustomLayout(attrs)
-            createDefaultLayout()
         }
-
-        addView(title)
-        addView(editText)
-        title!!.visibility = View.INVISIBLE
-
-//        editText!!.addTextChangedListener(object : TextWatcher {
-//
-//            override fun onTextChanged(
-//                s: CharSequence, start: Int, before: Int,
-//                count: Int
-//            ) {
-//                if (editText!!.text.toString().isNotEmpty() && title!!.visibility == View.INVISIBLE) {
-//                    showHint()
-//                } else if (editText!!.text.toString().isEmpty() && title!!.visibility == View.VISIBLE) {
-//                    hideHint()
-//                }
-//            }
-//
-//            override fun beforeTextChanged(
-//                s: CharSequence, start: Int, count: Int,
-//                after: Int
-//            ) {
-//                // TODO Auto-generated method stub
-//            }
-//
-//            override fun afterTextChanged(s: Editable) {
-//                // TODO Auto-generated method stub
-//            }
-//        })
     }
 
-    @SuppressLint("ResourceType")
-    private fun createDefaultLayout() {
-        editText!!.gravity = Gravity.LEFT or Gravity.TOP
-        title!!.gravity = Gravity.LEFT
-
-        title!!.setTextColor(Color.BLACK)
-        editText!!.setTextColor(Color.BLACK)
-
-        val context = context
-        editText!!.setTextAppearance(context, android.R.attr.textAppearanceMedium)
-        title!!.setTextAppearance(context, android.R.attr.textAppearanceSmall)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            editText!!.backgroundTintList = ColorStateList.valueOf(Color.RED)
-        }
-        title!!.setPadding(5, 2, 5, 2)
-    }
-
-    private var floatTitleErrorColor: ColorStateList? = null
+    private var errorMsgTextColor: ColorStateList? = null
 
     private var floatHintTextColorFocused: ColorStateList? = null
 
     private var floatHintTextColorUnFocused: ColorStateList? = null
 
     private fun createCustomLayout(attrs: AttributeSet) {
-
         val attr = context.obtainStyledAttributes(
             attrs,
             R.styleable.EditTextEx, 0, 0
@@ -143,10 +93,9 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         // For Floating Hint
         val floatHintText = attr
             .getString(R.styleable.EditTextEx_floatHintText)
-        hint = floatHintText
         floatHintTextColorFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorFocused)
-        floatTitleErrorColor = attr
+        errorMsgTextColor = attr
             .getColorStateList(R.styleable.EditTextEx_floatTitleErrorColor)
         floatHintTextColorUnFocused = attr
             .getColorStateList(R.styleable.EditTextEx_floatHintTextColorUnFocused)
@@ -188,13 +137,13 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         )
 
         attr.recycle()
-
         setFloatHintTextColor(
             getColorStateList(
                 floatHintTextColorFocused,
                 floatHintTextColorUnFocused
             )
         )
+        setErrorMsgTextColor(getColorStateList(errorMsgTextColor, floatHintTextColorUnFocused))
 
         setFloatHintTextSize(floatHintTextSize)
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
@@ -202,12 +151,19 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
         setFloatHintTextBackGround(floatHintTextBackground)
 
         setTextHint(floatHintText)
+        setTitleText(floatHintText)
         setTextColor(textColor)
         setTextSize(textSize)
         setTextTypeFace(textTypefaceName, textStyle)
         setTextGravity(textGravity)
         setTextBackGround(textBackground)
         setPassword(isPassword)
+    }
+
+    private fun setTitleText(floatHintText: String?) {
+        floatHintText?.let {
+            title.text = it
+        }
     }
 
     private fun getColorStateList(
@@ -225,7 +181,7 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
 
     /** FOR LABEL  */
     private fun setFloatHintGravity(floatHintTextGravity: Int) {
-        title!!.gravity = floatHintTextGravity
+        title.gravity = floatHintTextGravity
     }
 
     private fun setFloatHintTypeFace(
@@ -237,49 +193,38 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
                 context.assets,
                 floatHintTextTypefaceName
             )
-            title!!.typeface = face
+            title.typeface = face
         } catch (e: Exception) {
-            title!!.setTypeface(null, floatHintTextStyle)
+            title.setTypeface(null, floatHintTextStyle)
         }
 
     }
 
-    private var hadErrors = true
-
-    fun setFloatHintText(msg: String) {
-        val isError = !msg.isEmpty()
-        if (hadErrors != isError) {
-            if (isError) {
-                setFloatHintTextColor(getColorStateList(floatTitleErrorColor, floatHintTextColorUnFocused))
-                title!!.text = msg
-                hideHint()
-                showHint()
-            } else {
-                if (!text!!.isEmpty()) {
-                    setFloatHintTextColor(getColorStateList(floatHintTextColorFocused, floatHintTextColorUnFocused))
-                    title!!.text = hint
-                    hideHint()
-                    showHint()
-                } else {
-                    hideHint()
-                }
-            }
-        }
-        hadErrors = isError
+    fun setErrorMsg(msg: String) {
+        //show error
+        errorMsg.text = msg
+        hideHint(false)
+        showErrorMsg()
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {
-        title!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize.toFloat())
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize.toFloat())
     }
 
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
         if (floatHintTextColor != null) {
-            title!!.setTextColor(floatHintTextColor)
+            title.setTextColor(floatHintTextColor)
+        }
+    }
+
+    private fun setErrorMsgTextColor(errorMsgTextColor: ColorStateList?) {
+        if (errorMsgTextColor != null) {
+            errorMsg.setTextColor(errorMsgTextColor)
         }
     }
 
     private fun setFloatHintTextBackGround(textBackground: Drawable?) {
-        editText!!.setBackgroundDrawable(textBackground)
+        editText.setBackgroundDrawable(textBackground)
     }
 
     /** FOR TEXT  */
@@ -287,17 +232,17 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
     private fun setPassword(isPassword: Boolean) {
         // TODO Auto-generated method stub
         if (isPassword) {
-            editText!!.transformationMethod = PasswordTransformationMethod
+            editText.transformationMethod = PasswordTransformationMethod
                 .getInstance()
         }
     }
 
     private fun setTextBackGround(textBackground: Drawable?) {
-        editText!!.setBackgroundDrawable(textBackground)
+        editText.setBackgroundDrawable(textBackground)
     }
 
     private fun setTextGravity(textGravity: Int) {
-        editText!!.gravity = textGravity
+        editText.gravity = textGravity
     }
 
     private fun setTextTypeFace(textTypefaceName: String?, textStyle: Int) {
@@ -306,49 +251,67 @@ class EditTextEx : LinearLayout, OnFocusChangeListener {
                 context.assets,
                 textTypefaceName
             )
-            editText!!.typeface = face
+            editText.typeface = face
         } catch (e: Exception) {
-            editText!!.setTypeface(null, textStyle)
+            editText.setTypeface(null, textStyle)
         }
 
     }
 
     private fun setTextSize(textSize: Int) {
-        editText!!.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize.toFloat())
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize.toFloat())
     }
 
     private fun setTextColor(textColor: ColorStateList?) {
         if (textColor != null) {
-            editText!!.setTextColor(textColor)
+            editText.setTextColor(textColor)
         }
     }
 
     fun setTextHint(hintText: String?) {
-        if (hintText != null) {
-            editText!!.hint = hintText
+        hintText?.let {
+            editText.hint = hintText
         }
     }
 
-    private fun showHint(withAnimation: Boolean = true) {
-        if (title!!.visibility != View.VISIBLE) {
-            title!!.visibility = View.VISIBLE
+    fun showHint(withAnimation: Boolean = true) {
+        hideErrorMsgView(false)
+        if (title.visibility != View.VISIBLE) {
+            title.visibility = View.VISIBLE
             if (withAnimation) {
-                title!!.startAnimation(bottomUp)
+                title.startAnimation(bottomUp)
             }
         }
     }
 
-    private fun hideHint(withAnimation: Boolean = true) {
-        if (title!!.visibility != View.INVISIBLE) {
-            title!!.visibility = View.INVISIBLE
+    private fun showErrorMsg(withAnimation: Boolean = true) {
+        if (errorMsg.visibility != View.VISIBLE) {
+            errorMsg.visibility = View.VISIBLE
+            if (withAnimation) {
+                errorMsg.startAnimation(bottomUp)
+            }
+        }
+    }
+
+    private fun hideErrorMsgView(withAnimation: Boolean = true) {
+        if (errorMsg.visibility != View.INVISIBLE) {
+            errorMsg.visibility = View.INVISIBLE
             if (withAnimation)
-                title!!.startAnimation(bottomDown)
+                errorMsg.startAnimation(bottomDown)
+        }
+    }
+
+    private fun hideHint(withAnimation: Boolean = true) {
+        if (title.visibility != View.INVISIBLE) {
+            title.visibility = View.INVISIBLE
+            if (withAnimation)
+                title.startAnimation(bottomDown)
         }
     }
 
     override fun onFocusChange(v: View, hasFocus: Boolean) {
-        title!!.isSelected = hasFocus
-        focusChangeListener?.onFocusChange(this, hasFocus)
+        title.isSelected = hasFocus
+        focusChangeListener.onFocusChange(this, hasFocus)
     }
 }
 

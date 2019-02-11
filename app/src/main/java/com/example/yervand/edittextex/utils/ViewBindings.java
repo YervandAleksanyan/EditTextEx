@@ -12,13 +12,14 @@ public class ViewBindings {
     public static void setValidationProperties(EditTextEx textInputLayout,
                                                ObservableArrayMap<ObservableField, String> errors,
                                                ObservableField property) {
+
         if (!errors.containsKey(property)) {
-            textInputLayout.setFloatHintText("");
+            textInputLayout.showHint(true);
             return;
         }
         String error = errors.get(property);
         if (error != null) {
-            textInputLayout.setFloatHintText(error);
+            textInputLayout.setErrorMsg(error);
         }
     }
 

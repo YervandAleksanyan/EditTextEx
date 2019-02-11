@@ -13,10 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".view.MainActivity">
-        <EditText android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"/>
-
         <com.example.yervand.edittextex.EditTextEx android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:layout_marginBottom="8dp"
@@ -25,7 +21,6 @@
                                                    app:floatHintTextColorUnFocused="@android:color/black"
                                                    app:floatTitleErrorColor="@android:color/holo_red_dark"
                                                    app:layout_constraintBottom_toBottomOf="parent"
-                                                   app:textBackground="@color/colorPrimary"
                                                    android:layout_marginTop="8dp"
                                                    property="@{viewModel.email}"
                                                    errors="@{viewModel.validator.errors}"
