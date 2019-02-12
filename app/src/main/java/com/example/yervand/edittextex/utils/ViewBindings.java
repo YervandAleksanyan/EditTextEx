@@ -14,7 +14,8 @@ public class ViewBindings {
                                                ObservableField property) {
 
         if (!errors.containsKey(property)) {
-            textInputLayout.showHint(true);
+            if (property.get() != null)
+                textInputLayout.showHint(true);
             return;
         }
         String error = errors.get(property);

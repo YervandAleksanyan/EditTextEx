@@ -19,7 +19,7 @@ class MainValidator(viewModel: MainViewModel) : BaseViewModelValidator() {
             override fun validate(context: ValidatorContext, s: String?): Boolean {
                 clear()
                 if (s == null || s.isEmpty())
-                    addMessage("password required")
+                    addMessage("Password required")
                 return super.validate(context, s)
             }
         })

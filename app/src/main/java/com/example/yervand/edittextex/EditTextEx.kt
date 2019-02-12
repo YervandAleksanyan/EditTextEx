@@ -24,7 +24,8 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     private lateinit var errorMsg: TextView
     private lateinit var bottomUp: Animation
     private lateinit var bottomDown: Animation
-    private lateinit var focusChangeListener: OnFloatingLableFocusChangeListener
+    private var focusChangeListener: OnFloatingLableFocusChangeListener? = null
+    private var firstLoad = false
 
     var text: String?
         get() = editText.text.toString()
@@ -52,28 +53,13 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
         editText = findViewById(R.id.input)
         title = findViewById(R.id.title)
         errorMsg = findViewById(R.id.error_msg)
-//        editText = AppCompatEditText(context)
-//        title = TextView(context)
-//        errorMsg = TextView(context)
-//
+        editText.onFocusChangeListener = this
         bottomUp = AnimationUtils.loadAnimation(context, R.anim.txt_bottom_up)
         bottomDown = AnimationUtils.loadAnimation(
             context,
             R.anim.txt_bottom_down
         )
-//        // Create Default Layout
-//        inputTextParams = RelativeLayout.LayoutParams(
-//            RelativeLayout.LayoutParams.MATCH_PARENT,
-//            RelativeLayout.LayoutParams.WRAP_CONTENT
-//        )
-//        displayTextParams = RelativeLayout.LayoutParams(
-//            RelativeLayout.LayoutParams.MATCH_PARENT,
-//            RelativeLayout.LayoutParams.WRAP_CONTENT
-//        )
-//        displayTextParams.addRule(RelativeLayout.BELOW, editText.id)
-//        editText.layoutParams = inputTextParams
-//        title.layoutParams = displayTextParams
-//        errorMsg.layoutParams = displayTextParams
+
         if (attrs != null) {
             createCustomLayout(attrs)
         }
@@ -143,8 +129,8 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
                 floatHintTextColorUnFocused
             )
         )
-        setErrorMsgTextColor(getColorStateList(errorMsgTextColor, floatHintTextColorUnFocused))
 
+        setErrorMsgTextColor(getColorStateList(errorMsgTextColor, floatHintTextColorUnFocused))
         setFloatHintTextSize(floatHintTextSize)
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
@@ -201,9 +187,8 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     }
 
     fun setErrorMsg(msg: String) {
-        //show error
         errorMsg.text = msg
-        hideHint(false)
+        hideHint()
         showErrorMsg()
     }
 
@@ -212,14 +197,14 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     }
 
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
-        if (floatHintTextColor != null) {
-            title.setTextColor(floatHintTextColor)
+        floatHintTextColor?.let {
+            title.setTextColor(it)
         }
     }
 
     private fun setErrorMsgTextColor(errorMsgTextColor: ColorStateList?) {
-        if (errorMsgTextColor != null) {
-            errorMsg.setTextColor(errorMsgTextColor)
+        errorMsgTextColor?.let {
+            errorMsg.setTextColor(it)
         }
     }
 
@@ -275,7 +260,7 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     }
 
     fun showHint(withAnimation: Boolean = true) {
-        hideErrorMsgView(false)
+        hideErrorMsgView()
         if (title.visibility != View.VISIBLE) {
             title.visibility = View.VISIBLE
             if (withAnimation) {
@@ -311,7 +296,8 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
 
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         title.isSelected = hasFocus
-        focusChangeListener.onFocusChange(this, hasFocus)
+        errorMsg.isSelected = hasFocus
+        focusChangeListener?.onFocusChange(this, hasFocus)
     }
 }
 
