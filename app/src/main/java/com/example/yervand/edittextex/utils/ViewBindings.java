@@ -15,7 +15,7 @@ public class ViewBindings {
 
         if (!errors.containsKey(property)) {
             if (property.get() != null)
-                textInputLayout.showHint(true);
+                textInputLayout.showTitle();
             return;
         }
         String error = errors.get(property);

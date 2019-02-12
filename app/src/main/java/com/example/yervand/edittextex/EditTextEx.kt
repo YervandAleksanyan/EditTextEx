@@ -1,5 +1,7 @@
 package com.example.yervand.edittextex
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -11,6 +13,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.EditText
@@ -25,6 +28,14 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     private lateinit var bottomUp: Animation
     private lateinit var bottomDown: Animation
     private var focusChangeListener: OnFloatingLableFocusChangeListener? = null
+    private lateinit var flipAnimationTitle: ObjectAnimator
+    private lateinit var flipAnimationErrorMsg: ObjectAnimator
+
+    private lateinit var alphaAnimationTitle: ObjectAnimator
+    private lateinit var alphaAnimationErrorMsg: ObjectAnimator
+    private lateinit var animationSetTitle: AnimatorSet
+    private lateinit var animationSetErrorMsg: AnimatorSet
+
     private var firstLoad = false
 
     var text: String?
@@ -59,11 +70,37 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
             context,
             R.anim.txt_bottom_down
         )
-
+        initAnimation()
         if (attrs != null) {
             createCustomLayout(attrs)
         }
     }
+
+    private fun initAnimation() {
+        flipAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "rotationX", -90F, 0f)
+        flipAnimationErrorMsg.duration = 250
+        flipAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
+
+        flipAnimationTitle = ObjectAnimator.ofFloat(title, "rotationX", -90F, 0f)
+        flipAnimationTitle.duration = 250
+        flipAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
+
+
+        alphaAnimationTitle = ObjectAnimator.ofFloat(title, "alpha", 0F, 1F)
+        alphaAnimationTitle.duration = 250
+        alphaAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
+
+        alphaAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "alpha", 0F, 1F)
+        alphaAnimationErrorMsg.duration = 250
+        alphaAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
+
+        animationSetTitle = AnimatorSet()
+        animationSetTitle.playTogether(flipAnimationTitle, alphaAnimationTitle)
+
+        animationSetErrorMsg = AnimatorSet()
+        animationSetErrorMsg.playTogether(flipAnimationErrorMsg, alphaAnimationErrorMsg)
+    }
+
 
     private var errorMsgTextColor: ColorStateList? = null
 
@@ -183,12 +220,10 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
         } catch (e: Exception) {
             title.setTypeface(null, floatHintTextStyle)
         }
-
     }
 
     fun setErrorMsg(msg: String) {
         errorMsg.text = msg
-        hideHint()
         showErrorMsg()
     }
 
@@ -259,44 +294,48 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
         }
     }
 
-    fun showHint(withAnimation: Boolean = true) {
-        hideErrorMsgView()
-        if (title.visibility != View.VISIBLE) {
-            title.visibility = View.VISIBLE
-            if (withAnimation) {
-                title.startAnimation(bottomUp)
-            }
+    fun showTitle() {
+        if (errorMsg.visibility == View.VISIBLE) {
+            hideErrorMsg()
+            title.rotationX = 90F
+            title.alpha = 0f
+            title.visibility = visibility
+            animationSetTitle.start()
         }
     }
 
-    private fun showErrorMsg(withAnimation: Boolean = true) {
-        if (errorMsg.visibility != View.VISIBLE) {
-            errorMsg.visibility = View.VISIBLE
-            if (withAnimation) {
-                errorMsg.startAnimation(bottomUp)
-            }
+    private fun showErrorMsg() {
+        if (title.visibility == View.VISIBLE) {
+            hideTitle()
+            errorMsg.rotationX = 90F
+            errorMsg.alpha = 0f
+            errorMsg.visibility = visibility
+            animationSetErrorMsg.start()
         }
     }
 
-    private fun hideErrorMsgView(withAnimation: Boolean = true) {
+    private fun hideErrorMsg() {
         if (errorMsg.visibility != View.INVISIBLE) {
             errorMsg.visibility = View.INVISIBLE
-            if (withAnimation)
-                errorMsg.startAnimation(bottomDown)
         }
     }
 
-    private fun hideHint(withAnimation: Boolean = true) {
+    private fun hideTitle() {
         if (title.visibility != View.INVISIBLE) {
             title.visibility = View.INVISIBLE
-            if (withAnimation)
-                title.startAnimation(bottomDown)
         }
     }
 
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         title.isSelected = hasFocus
         errorMsg.isSelected = hasFocus
+        if (text?.isEmpty()!!) {
+            if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
+                title.startAnimation(bottomDown)
+                title.visibility = View.VISIBLE
+                title.startAnimation(bottomUp)
+            }
+        }
         focusChangeListener?.onFocusChange(this, hasFocus)
     }
 }
