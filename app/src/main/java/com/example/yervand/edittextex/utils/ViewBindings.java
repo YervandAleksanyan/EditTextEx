@@ -12,7 +12,6 @@ public class ViewBindings {
     public static void setValidationProperties(EditTextEx textInputLayout,
                                                ObservableArrayMap<ObservableField, String> errors,
                                                ObservableField property) {
-
         if (!errors.containsKey(property)) {
             if (property.get() != null)
                 textInputLayout.showTitle();
@@ -28,7 +27,7 @@ public class ViewBindings {
     public static void getBindableText(EditTextEx editTextEx, String message, final InverseBindingListener listener) {
         if (editTextEx.getText().equals(message)) return;
         editTextEx.setText(message);
-        editTextEx.getEditText().setSelection(editTextEx.getText().length());
+//        editTextEx.getEditText().setSelection(editTextEx.getText().length());
         TextWatcher watcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

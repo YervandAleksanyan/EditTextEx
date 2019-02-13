@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             tools:context=".view.MainActivity">
         <EditText android:layout_width="match_parent"
-                  android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                  android:layout_height="wrap_content"
                   app:layout_constraintTop_toTopOf="parent"/>
         <com.example.yervand.edittextex.EditTextEx android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
@@ -24,7 +24,6 @@
                                                    app:floatHintTextColorUnFocused="@android:color/black"
                                                    app:floatTitleErrorColor="@android:color/holo_red_dark"
                                                    app:layout_constraintBottom_toBottomOf="parent"
-                                                   android:layout_marginTop="8dp"
                                                    property="@{viewModel.email}"
                                                    errors="@{viewModel.validator.errors}"
                                                    bindableText="@={viewModel.email}"
@@ -33,14 +32,13 @@
 
         <com.example.yervand.edittextex.EditTextEx android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
-                                                   app:floatHintText="Password"
+                                                   app:floatHintText="Password required"
                                                    app:floatHintTextColorFocused="@android:color/holo_blue_dark"
                                                    app:floatHintTextColorUnFocused="@android:color/black"
                                                    app:floatTitleErrorColor="@android:color/holo_red_dark"
                                                    property="@{viewModel.password}"
                                                    errors="@{viewModel.validator.errors}"
                                                    bindableText="@={viewModel.password}"
-                                                   android:layout_marginTop="8dp"
                                                    app:layout_constraintTop_toBottomOf="@+id/editTextEx">
 
         </com.example.yervand.edittextex.EditTextEx>

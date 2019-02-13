@@ -17,10 +17,10 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.EditText
-import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 
-class EditTextEx : RelativeLayout, OnFocusChangeListener {
+class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
     lateinit var editText: EditText
     private lateinit var title: TextView
@@ -36,7 +36,6 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     private lateinit var animationSetTitle: AnimatorSet
     private lateinit var animationSetErrorMsg: AnimatorSet
 
-    private var firstLoad = false
 
     var text: String?
         get() = editText.text.toString()
@@ -60,10 +59,10 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
 
     private fun createLayout(attrs: AttributeSet?) {
         val context = context
-        View.inflate(context, R.layout.edit_text_ex_layout, this)
-        editText = findViewById(R.id.input)
-        title = findViewById(R.id.title)
-        errorMsg = findViewById(R.id.error_msg)
+        val view = inflate(context, R.layout.edit_text_ex_layout, this)
+        editText = view.findViewById(R.id.input)
+        title = view.findViewById(R.id.title)
+        errorMsg = view.findViewById(R.id.error_msg)
         editText.onFocusChangeListener = this
         bottomUp = AnimationUtils.loadAnimation(context, R.anim.txt_bottom_up)
         bottomDown = AnimationUtils.loadAnimation(
@@ -77,21 +76,21 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     }
 
     private fun initAnimation() {
-        flipAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "rotationX", -90F, 0f)
-        flipAnimationErrorMsg.duration = 250
+        flipAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "rotationX", -180F, 0f)
+        flipAnimationErrorMsg.duration = 500
         flipAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
 
-        flipAnimationTitle = ObjectAnimator.ofFloat(title, "rotationX", -90F, 0f)
-        flipAnimationTitle.duration = 250
+        flipAnimationTitle = ObjectAnimator.ofFloat(title, "rotationX", -180F, 0f)
+        flipAnimationTitle.duration = 500
         flipAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
 
 
         alphaAnimationTitle = ObjectAnimator.ofFloat(title, "alpha", 0F, 1F)
-        alphaAnimationTitle.duration = 250
+        alphaAnimationTitle.duration = 500
         alphaAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
 
         alphaAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "alpha", 0F, 1F)
-        alphaAnimationErrorMsg.duration = 250
+        alphaAnimationErrorMsg.duration = 500
         alphaAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
 
         animationSetTitle = AnimatorSet()
@@ -99,6 +98,7 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
 
         animationSetErrorMsg = AnimatorSet()
         animationSetErrorMsg.playTogether(flipAnimationErrorMsg, alphaAnimationErrorMsg)
+
     }
 
 
@@ -172,7 +172,7 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
         setFloatHintTextBackGround(floatHintTextBackground)
-
+//
         setTextHint(floatHintText)
         setTitleText(floatHintText)
         setTextColor(textColor)
@@ -228,7 +228,9 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {
+/*
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize.toFloat())
+*/
     }
 
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
@@ -296,20 +298,20 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
 
     fun showTitle() {
         if (errorMsg.visibility == View.VISIBLE) {
-            hideErrorMsg()
-            title.rotationX = 90F
+            title.rotationX = -180F
             title.alpha = 0f
-            title.visibility = visibility
+            hideErrorMsg()
+            title.visibility = View.VISIBLE
             animationSetTitle.start()
         }
     }
 
     private fun showErrorMsg() {
         if (title.visibility == View.VISIBLE) {
-            hideTitle()
-            errorMsg.rotationX = 90F
+            errorMsg.rotationX = -180F
             errorMsg.alpha = 0f
-            errorMsg.visibility = visibility
+            hideTitle()
+            errorMsg.visibility = View.VISIBLE
             animationSetErrorMsg.start()
         }
     }
@@ -331,9 +333,9 @@ class EditTextEx : RelativeLayout, OnFocusChangeListener {
         errorMsg.isSelected = hasFocus
         if (text?.isEmpty()!!) {
             if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
-                title.startAnimation(bottomDown)
+//                title.startAnimation(bottomDown)
                 title.visibility = View.VISIBLE
-                title.startAnimation(bottomUp)
+//                title.startAnimation(bottomUp)
             }
         }
         focusChangeListener?.onFocusChange(this, hasFocus)
