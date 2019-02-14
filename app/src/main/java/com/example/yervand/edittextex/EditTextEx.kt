@@ -172,7 +172,6 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
         setFloatHintTextBackGround(floatHintTextBackground)
-//
         setTextHint(floatHintText)
         setTitleText(floatHintText)
         setTextColor(textColor)
@@ -333,9 +332,9 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         errorMsg.isSelected = hasFocus
         if (text?.isEmpty()!!) {
             if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
-//                title.startAnimation(bottomDown)
+                title.startAnimation(bottomDown)
                 title.visibility = View.VISIBLE
-//                title.startAnimation(bottomUp)
+                title.startAnimation(bottomUp)
             }
         }
         focusChangeListener?.onFocusChange(this, hasFocus)

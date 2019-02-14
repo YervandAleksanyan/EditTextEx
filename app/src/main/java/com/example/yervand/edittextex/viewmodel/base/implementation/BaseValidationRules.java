@@ -1,5 +1,6 @@
 package com.example.yervand.edittextex.viewmodel.base.implementation;
 
+import android.text.TextUtils;
 import com.baidu.unbiz.fluentvalidator.Validator;
 import com.baidu.unbiz.fluentvalidator.ValidatorContext;
 import com.baidu.unbiz.fluentvalidator.ValidatorHandler;
@@ -39,12 +40,8 @@ public abstract class BaseValidationRules<T> extends ValidatorHandler<T> impleme
 
             return true;
         }
-        StringBuilder builder = new StringBuilder();
-        for (String message : errorMessages) {
-            builder.append(message);
-            builder.append("\n");
-        }
-        context.addErrorMsg(builder.toString());
+        String message = TextUtils.join(" ", errorMessages);
+        context.addErrorMsg(message);
         return false;
     }
 }

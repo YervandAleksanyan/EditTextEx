@@ -13,8 +13,9 @@ public class ViewBindings {
                                                ObservableArrayMap<ObservableField, String> errors,
                                                ObservableField property) {
         if (!errors.containsKey(property)) {
-            if (property.get() != null)
+            if (property.get() != null) {
                 textInputLayout.showTitle();
+            }
             return;
         }
         String error = errors.get(property);

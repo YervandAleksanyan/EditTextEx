@@ -10,16 +10,18 @@ class MainValidator(viewModel: MainViewModel) : BaseViewModelValidator() {
         addRule(viewModel.email, String::class.java, object : BaseValidationRules<String>() {
             override fun validate(context: ValidatorContext, s: String?): Boolean {
                 clear()
-                if (!Patterns.EMAIL_ADDRESS.matcher(s).matches())
+                if (!Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
                     addMessage("Email required")
+                }
                 return super.validate(context, s)
             }
         })
         addRule(viewModel.password, String::class.java, object : BaseValidationRules<String>() {
             override fun validate(context: ValidatorContext, s: String?): Boolean {
                 clear()
-                if (s == null || s.isEmpty())
+                if (s == null || s.isEmpty()) {
                     addMessage("Password required")
+                }
                 return super.validate(context, s)
             }
         })

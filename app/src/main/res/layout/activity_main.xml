@@ -32,7 +32,7 @@
 
         <com.example.yervand.edittextex.EditTextEx android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
-                                                   app:floatHintText="Password required"
+                                                   app:floatHintText="Password"
                                                    app:floatHintTextColorFocused="@android:color/holo_blue_dark"
                                                    app:floatHintTextColorUnFocused="@android:color/black"
                                                    app:floatTitleErrorColor="@android:color/holo_red_dark"
