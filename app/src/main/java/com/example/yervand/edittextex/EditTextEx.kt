@@ -14,28 +14,42 @@ import android.view.Gravity
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.example.yervand.edittextex.utils.convertDpToPixel
 
 class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
+
+    //View
     lateinit var editText: EditText
     private lateinit var title: TextView
     private lateinit var errorMsg: TextView
-    private lateinit var bottomUp: Animation
-    private lateinit var bottomDown: Animation
-    private var focusChangeListener: OnFloatingLableFocusChangeListener? = null
+
+    //Animation
     private lateinit var flipAnimationTitle: ObjectAnimator
     private lateinit var flipAnimationErrorMsg: ObjectAnimator
-
     private lateinit var alphaAnimationTitle: ObjectAnimator
     private lateinit var alphaAnimationErrorMsg: ObjectAnimator
+
+    private lateinit var translationAnimationUpTitle: ObjectAnimator
+    private lateinit var translationAnimationDownTitle: ObjectAnimator
+
+    private lateinit var scaleAnimationUpTitleX: ObjectAnimator
+    private lateinit var scaleAnimationDownTitleX: ObjectAnimator
+
+    private lateinit var scaleAnimationUpTitleY: ObjectAnimator
+    private lateinit var scaleAnimationDownTitleY: ObjectAnimator
+
     private lateinit var animationSetTitle: AnimatorSet
     private lateinit var animationSetErrorMsg: AnimatorSet
 
+    private lateinit var upTitleAnimationSet: AnimatorSet
+    private lateinit var downTitleAnimationSet: AnimatorSet
+
+
+    private var focusChangeListener: OnFloatingLableFocusChangeListener? = null
 
     var text: String?
         get() = editText.text.toString()
@@ -64,18 +78,53 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         title = view.findViewById(R.id.title)
         errorMsg = view.findViewById(R.id.error_msg)
         editText.onFocusChangeListener = this
-        bottomUp = AnimationUtils.loadAnimation(context, R.anim.txt_bottom_up)
-        bottomDown = AnimationUtils.loadAnimation(
-            context,
-            R.anim.txt_bottom_down
-        )
-        initAnimation()
+
+
         if (attrs != null) {
             createCustomLayout(attrs)
         }
+        editText.measure(rootView.width, rootView.height)
+        initAnimation()
     }
 
     private fun initAnimation() {
+
+        translationAnimationUpTitle =
+            ObjectAnimator.ofFloat(
+                title,
+                "translationY",
+                editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat()),
+                0F
+            )
+        translationAnimationUpTitle.duration = 500
+        translationAnimationUpTitle.interpolator = AccelerateDecelerateInterpolator()
+
+        translationAnimationDownTitle =
+            ObjectAnimator.ofFloat(
+                title,
+                "translationY",
+                0F,
+                editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
+            )
+        translationAnimationDownTitle.duration = 0
+        translationAnimationDownTitle.interpolator = AccelerateDecelerateInterpolator()
+
+        scaleAnimationUpTitleX = ObjectAnimator.ofFloat(title, "scaleX", 0F, 0.7F)
+        scaleAnimationUpTitleX.duration = 500
+        scaleAnimationUpTitleX.interpolator = AccelerateDecelerateInterpolator()
+
+        scaleAnimationUpTitleY = ObjectAnimator.ofFloat(title, "scaleY", 0F, 0.7F)
+        scaleAnimationUpTitleY.duration = 500
+        scaleAnimationUpTitleY.interpolator = AccelerateDecelerateInterpolator()
+
+        scaleAnimationDownTitleX = ObjectAnimator.ofFloat(title, "scaleX", 0.7F, 0F)
+        scaleAnimationDownTitleX.duration = 0
+        scaleAnimationDownTitleX.interpolator = AccelerateDecelerateInterpolator()
+
+        scaleAnimationDownTitleY = ObjectAnimator.ofFloat(title, "scaleY", 0.7F, 0F)
+        scaleAnimationDownTitleY.duration = 0
+        scaleAnimationDownTitleY.interpolator = AccelerateDecelerateInterpolator()
+
         flipAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "rotationX", -180F, 0f)
         flipAnimationErrorMsg.duration = 500
         flipAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
@@ -99,6 +148,19 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         animationSetErrorMsg = AnimatorSet()
         animationSetErrorMsg.playTogether(flipAnimationErrorMsg, alphaAnimationErrorMsg)
 
+        upTitleAnimationSet = AnimatorSet()
+        upTitleAnimationSet.playTogether(
+            translationAnimationUpTitle,
+            scaleAnimationUpTitleX,
+            scaleAnimationUpTitleY,
+            alphaAnimationTitle
+        )
+
+        downTitleAnimationSet = AnimatorSet()
+        downTitleAnimationSet.playTogether(
+            translationAnimationDownTitle,
+            scaleAnimationDownTitleY
+        )
     }
 
 
@@ -227,9 +289,7 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     }
 
     private fun setFloatHintTextSize(floatHintTextSize: Int) {
-/*
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize.toFloat())
-*/
     }
 
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
@@ -332,9 +392,25 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         errorMsg.isSelected = hasFocus
         if (text?.isEmpty()!!) {
             if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
-                title.startAnimation(bottomDown)
+                title
+                    .animate()
+                    .apply {
+                        this.translationY(
+                            editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
+                        )
+                        this.duration = 0
+                        this.alpha(0F)
+                    }.start()
+//                downTitleAnimationSet.start()
                 title.visibility = View.VISIBLE
-                title.startAnimation(bottomUp)
+//                upTitleAnimationSet.start()
+                title
+                    .animate()
+                    .apply {
+                        this.duration = 2000
+                        this.alpha(1F)
+                        this.translationY(0F)
+                    }.start()
             }
         }
         focusChangeListener?.onFocusChange(this, hasFocus)
