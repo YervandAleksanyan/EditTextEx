@@ -1,7 +1,6 @@
 package com.example.yervand.edittextex
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -13,7 +12,6 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnFocusChangeListener
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -27,27 +25,9 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     private lateinit var title: TextView
     private lateinit var errorMsg: TextView
 
-    //Animation
-    private lateinit var flipAnimationTitle: ObjectAnimator
-    private lateinit var flipAnimationErrorMsg: ObjectAnimator
-    private lateinit var alphaAnimationTitle: ObjectAnimator
-    private lateinit var alphaAnimationErrorMsg: ObjectAnimator
 
-    private lateinit var translationAnimationUpTitle: ObjectAnimator
-    private lateinit var translationAnimationDownTitle: ObjectAnimator
-
-    private lateinit var scaleAnimationUpTitleX: ObjectAnimator
-    private lateinit var scaleAnimationDownTitleX: ObjectAnimator
-
-    private lateinit var scaleAnimationUpTitleY: ObjectAnimator
-    private lateinit var scaleAnimationDownTitleY: ObjectAnimator
-
-    private lateinit var animationSetTitle: AnimatorSet
-    private lateinit var animationSetErrorMsg: AnimatorSet
-
-    private lateinit var upTitleAnimationSet: AnimatorSet
-    private lateinit var downTitleAnimationSet: AnimatorSet
-
+    private val fontIncreaseValueAnimator = ValueAnimator.ofFloat(0f, 12F)
+    private val fontDecreaseValueAnimator = ValueAnimator.ofFloat(12f, 0F)
 
     private var focusChangeListener: OnFloatingLableFocusChangeListener? = null
 
@@ -84,85 +64,10 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
             createCustomLayout(attrs)
         }
         editText.measure(rootView.width, rootView.height)
-        initAnimation()
+
+        fontIncreaseValueAnimator.duration = 1000
+        fontDecreaseValueAnimator.duration = 0
     }
-
-    private fun initAnimation() {
-
-        translationAnimationUpTitle =
-            ObjectAnimator.ofFloat(
-                title,
-                "translationY",
-                editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat()),
-                0F
-            )
-        translationAnimationUpTitle.duration = 500
-        translationAnimationUpTitle.interpolator = AccelerateDecelerateInterpolator()
-
-        translationAnimationDownTitle =
-            ObjectAnimator.ofFloat(
-                title,
-                "translationY",
-                0F,
-                editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
-            )
-        translationAnimationDownTitle.duration = 0
-        translationAnimationDownTitle.interpolator = AccelerateDecelerateInterpolator()
-
-        scaleAnimationUpTitleX = ObjectAnimator.ofFloat(title, "scaleX", 0F, 0.7F)
-        scaleAnimationUpTitleX.duration = 500
-        scaleAnimationUpTitleX.interpolator = AccelerateDecelerateInterpolator()
-
-        scaleAnimationUpTitleY = ObjectAnimator.ofFloat(title, "scaleY", 0F, 0.7F)
-        scaleAnimationUpTitleY.duration = 500
-        scaleAnimationUpTitleY.interpolator = AccelerateDecelerateInterpolator()
-
-        scaleAnimationDownTitleX = ObjectAnimator.ofFloat(title, "scaleX", 0.7F, 0F)
-        scaleAnimationDownTitleX.duration = 0
-        scaleAnimationDownTitleX.interpolator = AccelerateDecelerateInterpolator()
-
-        scaleAnimationDownTitleY = ObjectAnimator.ofFloat(title, "scaleY", 0.7F, 0F)
-        scaleAnimationDownTitleY.duration = 0
-        scaleAnimationDownTitleY.interpolator = AccelerateDecelerateInterpolator()
-
-        flipAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "rotationX", -180F, 0f)
-        flipAnimationErrorMsg.duration = 500
-        flipAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
-
-        flipAnimationTitle = ObjectAnimator.ofFloat(title, "rotationX", -180F, 0f)
-        flipAnimationTitle.duration = 500
-        flipAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
-
-
-        alphaAnimationTitle = ObjectAnimator.ofFloat(title, "alpha", 0F, 1F)
-        alphaAnimationTitle.duration = 500
-        alphaAnimationTitle.interpolator = AccelerateDecelerateInterpolator()
-
-        alphaAnimationErrorMsg = ObjectAnimator.ofFloat(errorMsg, "alpha", 0F, 1F)
-        alphaAnimationErrorMsg.duration = 500
-        alphaAnimationErrorMsg.interpolator = AccelerateDecelerateInterpolator()
-
-        animationSetTitle = AnimatorSet()
-        animationSetTitle.playTogether(flipAnimationTitle, alphaAnimationTitle)
-
-        animationSetErrorMsg = AnimatorSet()
-        animationSetErrorMsg.playTogether(flipAnimationErrorMsg, alphaAnimationErrorMsg)
-
-        upTitleAnimationSet = AnimatorSet()
-        upTitleAnimationSet.playTogether(
-            translationAnimationUpTitle,
-            scaleAnimationUpTitleX,
-            scaleAnimationUpTitleY,
-            alphaAnimationTitle
-        )
-
-        downTitleAnimationSet = AnimatorSet()
-        downTitleAnimationSet.playTogether(
-            translationAnimationDownTitle,
-            scaleAnimationDownTitleY
-        )
-    }
-
 
     private var errorMsgTextColor: ColorStateList? = null
 
@@ -230,18 +135,19 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         )
 
         setErrorMsgTextColor(getColorStateList(errorMsgTextColor, floatHintTextColorUnFocused))
-        setFloatHintTextSize(floatHintTextSize)
+        setErrorMsgTextSize(12F)
+        setFloatHintTextSize(floatHintTextSize.toFloat())
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
-        setFloatHintTextBackGround(floatHintTextBackground)
+//        setFloatHintTextBackGround(floatHintTextBackground)
         setTextHint(floatHintText)
         setTitleText(floatHintText)
         setTextColor(textColor)
         setTextSize(textSize)
         setTextTypeFace(textTypefaceName, textStyle)
         setTextGravity(textGravity)
-        setTextBackGround(textBackground)
-        setPassword(isPassword)
+//        setTextBackGround(textBackground)
+//        setPassword(isPassword)
     }
 
     private fun setTitleText(floatHintText: String?) {
@@ -288,8 +194,12 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         showErrorMsg()
     }
 
-    private fun setFloatHintTextSize(floatHintTextSize: Int) {
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize.toFloat())
+    private fun setFloatHintTextSize(floatHintTextSize: Float) {
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, floatHintTextSize)
+    }
+
+    private fun setErrorMsgTextSize(errorMsgTextSize: Float) {
+        errorMsg.setTextSize(TypedValue.COMPLEX_UNIT_SP, errorMsgTextSize)
     }
 
     private fun setFloatHintTextColor(floatHintTextColor: ColorStateList?) {
@@ -357,23 +267,16 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
 
     fun showTitle() {
         if (errorMsg.visibility == View.VISIBLE) {
-            title.rotationX = -180F
-            title.alpha = 0f
-            hideErrorMsg()
-            title.visibility = View.VISIBLE
-            animationSetTitle.start()
+            animateTitleShow()
         }
     }
 
     private fun showErrorMsg() {
         if (title.visibility == View.VISIBLE) {
-            errorMsg.rotationX = -180F
-            errorMsg.alpha = 0f
-            hideTitle()
-            errorMsg.visibility = View.VISIBLE
-            animationSetErrorMsg.start()
+            animateErrorMsgShow()
         }
     }
+
 
     private fun hideErrorMsg() {
         if (errorMsg.visibility != View.INVISIBLE) {
@@ -392,28 +295,78 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         errorMsg.isSelected = hasFocus
         if (text?.isEmpty()!!) {
             if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
-                title
-                    .animate()
-                    .apply {
-                        this.translationY(
-                            editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
-                        )
-                        this.duration = 0
-                        this.alpha(0F)
-                    }.start()
-//                downTitleAnimationSet.start()
+                animateTitleDown()
                 title.visibility = View.VISIBLE
-//                upTitleAnimationSet.start()
-                title
-                    .animate()
-                    .apply {
-                        this.duration = 2000
-                        this.alpha(1F)
-                        this.translationY(0F)
-                    }.start()
+                animateTitleUp()
             }
         }
         focusChangeListener?.onFocusChange(this, hasFocus)
+    }
+
+    private fun animateTitleDown() {
+        title
+            .animate()
+            .apply {
+                this.translationY(
+                    editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
+                )
+                this.duration = 0
+                this.alpha(0F)
+            }.start()
+        decreaseTitleFont()
+    }
+
+    private fun animateTitleUp() {
+        title
+            .animate()
+            .apply {
+                this.duration = 1000
+                this.alpha(1F)
+                this.translationY(0F)
+            }.start()
+        increaseTitleFont()
+    }
+
+    private fun animateTitleShow() {
+        title.rotationX = -180F
+        title.alpha = 0f
+        hideErrorMsg()
+        title.visibility = View.VISIBLE
+        title.animate()
+            .apply {
+                this.duration = 500
+                this.rotationX(0F)
+                this.alpha(1F)
+            }.start()
+    }
+
+    private fun animateErrorMsgShow() {
+        errorMsg.rotationX = -180F
+        errorMsg.alpha = 0f
+        hideTitle()
+        errorMsg.visibility = View.VISIBLE
+        errorMsg.animate()
+            .apply {
+                this.duration = 500
+                this.rotationX(0F)
+                this.alpha(1F)
+            }
+    }
+
+    private fun increaseTitleFont() {
+        fontIncreaseValueAnimator.start()
+        fontIncreaseValueAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            setFloatHintTextSize(value)
+        }
+    }
+
+    private fun decreaseTitleFont() {
+        fontDecreaseValueAnimator.start()
+        fontDecreaseValueAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            setFloatHintTextSize(value)
+        }
     }
 }
 
