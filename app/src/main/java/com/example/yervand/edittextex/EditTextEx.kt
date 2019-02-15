@@ -1,11 +1,15 @@
 package com.example.yervand.edittextex
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.text.TextUtils.isEmpty
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -15,7 +19,8 @@ import android.view.View.OnFocusChangeListener
 import android.widget.EditText
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.example.yervand.edittextex.utils.convertDpToPixel
+import androidx.core.content.ContextCompat
+
 
 class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     internal val TAG = javaClass.simpleName
@@ -39,7 +44,7 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
             }
         }
 
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {}
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         if (!isInEditMode) {
@@ -51,12 +56,14 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         createLayout(null)
     }
 
+    private lateinit var root: View
+
     private fun createLayout(attrs: AttributeSet?) {
         val context = context
-        val view = inflate(context, R.layout.edit_text_ex_layout, this)
-        editText = view.findViewById(R.id.input)
-        title = view.findViewById(R.id.title)
-        errorMsg = view.findViewById(R.id.error_msg)
+        root = inflate(context, R.layout.edit_text_ex_layout, this)
+        editText = root.findViewById(R.id.input)
+        title = root.findViewById(R.id.title)
+        errorMsg = root.findViewById(R.id.error_msg)
         editText.onFocusChangeListener = this
 
 
@@ -135,19 +142,17 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         )
 
         setErrorMsgTextColor(getColorStateList(errorMsgTextColor, floatHintTextColorUnFocused))
-        setErrorMsgTextSize(12F)
         setFloatHintTextSize(floatHintTextSize.toFloat())
         setFloatHintTypeFace(floatHintTextTypefaceName, floatHintTextStyle)
         setFloatHintGravity(floatHintTextGravity)
 //        setFloatHintTextBackGround(floatHintTextBackground)
-        setTextHint(floatHintText)
         setTitleText(floatHintText)
         setTextColor(textColor)
         setTextSize(textSize)
         setTextTypeFace(textTypefaceName, textStyle)
         setTextGravity(textGravity)
-//        setTextBackGround(textBackground)
-//        setPassword(isPassword)
+        setTextBackGround(textBackground)
+        setPassword(isPassword)
     }
 
     private fun setTitleText(floatHintText: String?) {
@@ -259,12 +264,6 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
         }
     }
 
-    fun setTextHint(hintText: String?) {
-        hintText?.let {
-            editText.hint = hintText
-        }
-    }
-
     fun showTitle() {
         if (errorMsg.visibility == View.VISIBLE) {
             animateTitleShow()
@@ -293,38 +292,11 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         title.isSelected = hasFocus
         errorMsg.isSelected = hasFocus
-        if (text?.isEmpty()!!) {
-            if (title.visibility == View.INVISIBLE && errorMsg.visibility == View.INVISIBLE) {
-                animateTitleDown()
-                title.visibility = View.VISIBLE
-                animateTitleUp()
-            }
-        }
+        tintTextView(hasFocus, title)
+        scaleHint(!hasFocus && isEmpty(editText.text), title)
+        tintTextView(hasFocus, errorMsg)
+        scaleHint(!hasFocus && isEmpty(editText.text), errorMsg)
         focusChangeListener?.onFocusChange(this, hasFocus)
-    }
-
-    private fun animateTitleDown() {
-        title
-            .animate()
-            .apply {
-                this.translationY(
-                    editText.measuredHeight.toFloat() / 2 + convertDpToPixel(title.paddingBottom.toFloat())
-                )
-                this.duration = 0
-                this.alpha(0F)
-            }.start()
-        decreaseTitleFont()
-    }
-
-    private fun animateTitleUp() {
-        title
-            .animate()
-            .apply {
-                this.duration = 1000
-                this.alpha(1F)
-                this.translationY(0F)
-            }.start()
-        increaseTitleFont()
     }
 
     private fun animateTitleShow() {
@@ -350,23 +322,61 @@ class EditTextEx : ConstraintLayout, OnFocusChangeListener {
                 this.duration = 500
                 this.rotationX(0F)
                 this.alpha(1F)
+            }.start()
+    }
+
+    private val HINT_ANIMATION_DURATION = 200L
+    private val HINT_SHRINK_SCALE = 0.8f
+    private val HALF = 0.5f
+
+
+    private fun scaleHint(grow: Boolean, v: TextView) {
+        val scale = if (grow) 1f else HINT_SHRINK_SCALE
+        val translationX = if (grow) 0F else getHintLateralTranslation(v)
+        val translationY = if (grow) 0F else getHintLongitudinalTranslation(v)
+        v.animate()
+            .scaleX(scale)
+            .scaleY(scale)
+            .translationX(translationX)
+            .translationY(translationY)
+            .setDuration(HINT_ANIMATION_DURATION)
+            .start()
+    }
+
+
+    private fun getHintLateralTranslation(v: TextView): Float {
+        val width = v.width.toFloat()
+        return -((width - HINT_SHRINK_SCALE * width) * HALF)
+    }
+
+    private fun getHintLongitudinalTranslation(v: View): Float {
+        val height = root.height.toFloat()
+        return -((height - v.height) * HALF)
+    }
+
+    private fun tintTextView(hasFocus: Boolean, v: TextView) {
+        val start = v.currentTextColor
+        val end = ContextCompat.getColor(
+            v.context, if (hasFocus)
+                android.R.color.holo_red_dark
+            else
+                android.R.color.black
+        )
+
+        val animator = ValueAnimator.ofObject(ArgbEvaluator(), start, end)
+        animator.duration = HINT_ANIMATION_DURATION
+        animator.addUpdateListener { animation -> v.setTextColor(animation.animatedValue as Int) }
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                setTintAlpha(hasFocus, v)
             }
+        })
+        animator.start()
     }
 
-    private fun increaseTitleFont() {
-        fontIncreaseValueAnimator.start()
-        fontIncreaseValueAnimator.addUpdateListener {
-            val value = it.animatedValue as Float
-            setFloatHintTextSize(value)
-        }
-    }
-
-    private fun decreaseTitleFont() {
-        fontDecreaseValueAnimator.start()
-        fontDecreaseValueAnimator.addUpdateListener {
-            val value = it.animatedValue as Float
-            setFloatHintTextSize(value)
-        }
+    private fun setTintAlpha(hasFocus: Boolean, v: View) {
+        v.alpha = if (!hasFocus) 0.38f else 1f
+        v.alpha = if (!hasFocus) 0.38f else 1f
     }
 }
 

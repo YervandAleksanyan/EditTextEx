@@ -1,51 +1,48 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".view.MainActivity">
-    <FrameLayout android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 app:layout_constraintTop_toTopOf="parent"
-                 app:layout_constraintBottom_toTopOf="@+id/input"
-                 app:layout_constraintStart_toStartOf="parent"
-    >
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/title"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="2dp"
-                android:maxLines="1"
-                android:visibility="invisible"
-        />
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:paddingLeft="@dimen/single_margin"
+                                                   android:paddingRight="@dimen/single_margin"
+>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/error_msg"
+            android:visibility="invisible"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@+id/input"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingLeft="@dimen/quarter_margin"
+            android:paddingRight="@dimen/quarter_margin"/>
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/error_msg"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="2dp"
-                android:maxLines="1"
-                android:visibility="invisible"
-        />
-    </FrameLayout>
+    <EditText
+            android:id="@+id/input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/three_quarter_margin"
+            android:paddingBottom="@dimen/three_quarter_margin"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"/>
 
+    <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="@+id/input"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingLeft="@dimen/quarter_margin"
+            android:paddingRight="@dimen/quarter_margin"/>
 
-    <EditText android:id="@+id/input"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingLeft="5dp"
-              android:paddingTop="2dp"
-              android:paddingRight="5dp"
-              android:paddingBottom="2dp"
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintBottom_toBottomOf="parent"
-              app:layout_constraintStart_toStartOf="parent"
-    />
 </androidx.constraintlayout.widget.ConstraintLayout>

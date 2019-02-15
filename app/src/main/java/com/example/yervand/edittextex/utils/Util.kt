@@ -8,3 +8,9 @@ fun convertDpToPixel(dp: Float): Float {
     val px = dp * (metrics.densityDpi / 160f)
     return Math.round(px).toFloat()
 }
+
+fun convertPixelsToDp(px: Float): Float {
+    val metrics = Resources.getSystem().displayMetrics
+    val dp = px / (metrics.densityDpi / 160f)
+    return Math.round(dp).toFloat()
+}
